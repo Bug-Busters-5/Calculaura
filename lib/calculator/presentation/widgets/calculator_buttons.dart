@@ -9,6 +9,11 @@ class CalculatorButton extends ConsumerWidget {
   final double? height;
   final Color? color;
   final TextStyle? style;
+  final double? radius;
+  final bool isOperator;
+  final Color? fontColor;
+  final FontWeight? fontWeight;
+  final double? fontSize;
 
   const CalculatorButton({
     Key? key,
@@ -18,23 +23,38 @@ class CalculatorButton extends ConsumerWidget {
     this.height,
     this.color,
     this.style,
+    this.radius,
+    this.fontColor,
+    this.fontWeight,
+    this.fontSize,
+    this.isOperator = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    return GestureDetector(
+
+    return InkWell(
+      highlightColor: Colors.blue.withOpacity(0.4),
+      splashColor: Colors.green.withOpacity(0.5),
+      borderRadius: BorderRadius.circular(radius ?? 15.sp),
       onTap: onPressed,
       child: Container(
-        width: width ?? 62.px,
-        height: height ?? 60.px,
-        margin: EdgeInsets.all(8.sp),
+        width: width ?? 33.sp,
+        height: height ?? 32.sp,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15.sp),
+          color: color,
+          borderRadius: BorderRadius.circular(radius ?? 15.sp),
         ),
         child: Center(
-            child: Text(text, style: style ?? theme.textTheme.titleMedium,),),
+          child: Text(
+            text,
+            style: theme.textTheme.titleMedium!.copyWith(
+                fontSize: fontSize ?? 20.sp,
+                color: fontColor,
+                fontWeight: fontWeight),
+          ),
+        ),
       ),
     );
   }

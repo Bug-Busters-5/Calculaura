@@ -9,12 +9,13 @@ ThemeData lightModeTheme = ThemeData(
     seedColor: const Color(0xFFADE2FF),
     secondary: const Color(0xFF19ACFF),
     onSecondaryContainer: const Color(0xFF7CC9FF),
+    secondaryContainer: const Color(0xFF19ACFF),
     background: const Color(0xFFF7F8FB),
   ),
   textTheme: TextTheme(
     titleMedium: TextStyle(
       color: const Color(0XFF38B9FF),
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeight.w700,
       fontSize: 14.sp,
     ),
     titleSmall: TextStyle(
@@ -37,7 +38,8 @@ ThemeData darkModeTheme = ThemeData(
     seedColor: const Color(0xFF005DB2),
     secondary: const Color(0xFF1991FF),
     background: const Color(0xFF17181A),
-    onSecondaryContainer: const Color(0xFF17181A),
+    onSecondaryContainer: const Color(0xFF303136),
+    secondaryContainer: const Color(0xFF1991FF),
   ),
   textTheme: TextTheme(
     titleMedium: TextStyle(
