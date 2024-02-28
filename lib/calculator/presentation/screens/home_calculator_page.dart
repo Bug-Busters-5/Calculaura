@@ -1,10 +1,15 @@
+import 'dart:ui';
+
 import 'package:calculaura/app/app_riverpod.dart';
 import 'package:calculaura/calculator/presentation/providers/mathematics_riverpod.dart';
 import 'package:calculaura/calculator/presentation/widgets/calculator_buttons.dart';
+import 'package:calculaura/core/app_assets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:rive/rive.dart';
 
 class HomeCalculatorPage extends ConsumerStatefulWidget {
   const HomeCalculatorPage({super.key});
@@ -14,7 +19,46 @@ class HomeCalculatorPage extends ConsumerStatefulWidget {
       _HomeCalculatorPageState();
 }
 
-class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage> {
+class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
+    with TickerProviderStateMixin {
+  // Animation controller that shows the sign up modal as well as translateY boarding content together
+  AnimationController? _signInAnimController;
+
+  // Control touch effect animation for the "Start the Course" button
+  late RiveAnimationController _btnController;
+
+  @override
+  void initState() {
+    super.initState();
+    _signInAnimController = AnimationController(
+      duration: const Duration(milliseconds: 350),
+      upperBound: 1,
+      vsync: this,
+    );
+
+    _btnController = OneShotAnimation("active", autoplay: false);
+
+    const springDesc = SpringDescription(
+      mass: 0.1,
+      stiffness: 40,
+      damping: 5,
+    );
+
+    _btnController.isActiveChanged.addListener(() {
+      if (!_btnController.isActive) {
+        final springAnim = SpringSimulation(springDesc, 0, 1, 0);
+        _signInAnimController?.animateWith(springAnim);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _signInAnimController?.dispose();
+    _btnController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final calculatorState = ref.watch(calculatorProvider);
@@ -39,11 +83,12 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage> {
       } else if (value == '=') {
         calculatorNotifier.calculateResult();
       } else if (value == 'e') {
+        calculatorNotifier.appendValue(value);
         calculatorNotifier.calculateE();
       } else if (value == 'µ') {
         calculatorNotifier.calculateMicro();
-      } else if (value == 'sin') {
-        calculatorNotifier.calculateSin();
+      } else if (value == 'sin(') {
+        calculatorNotifier.appendValue(value);
       } else if (value == 'deg') {
         calculatorNotifier.convertDeg();
       } else {
@@ -82,239 +127,293 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage> {
           ),
         ),
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 7.w),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 30.h,
+      body: Stack(
+        children: [
+          ImageFiltered(
+            imageFilter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+            child: Center(
+              child: OverflowBox(
+                maxWidth: double.infinity,
+                child: Transform.translate(
+                  offset: const Offset(200, 100),
+                  child: Image.asset(AppAssets.spline, fit: BoxFit.cover),
+                ),
+              ),
+            ),
+          ),
+          ImageFiltered(
+            imageFilter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+            child: const RiveAnimation.asset(AppAssets.shapesRiv),
+          ),
+          AnimatedBuilder(
+            animation: _signInAnimController!,
+            builder: (context, child) {
+              return Transform(
+                transform: Matrix4.translationValues(
+                    0, -50 * _signInAnimController!.value, 0),
+                child: child,
+              );
+            },
+            child: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 7.w),
                 child: Column(
                   children: [
-                    Text(
-                      calculatorState.expression,
-                      style: TextStyle(color: theme.colorScheme.outline),
-                    ),
-                    Text(
-                      calculatorState.result,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16.sp,
+                    SizedBox(
+                      height: 30.h,
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            calculatorState.expression,
+                            style: theme.textTheme.displayMedium,
+                          ),
+                          Text(
+                            calculatorState.result,
+                            style: theme.textTheme.displayLarge,
+                          ),
+                        ],
                       ),
+                    ),
+                    SizedBox(
+                      height: 50.h,
+                      child: LayoutBuilder(builder: (context, constraints) {
+                        final width = constraints.maxWidth;
+                        final height = constraints.maxHeight;
+                        return Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: width / 4 * 2.98,
+                                  height: height,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("e"),
+                                            height: 27.sp,
+                                            radius: 50.sp,
+                                            text: "e",
+                                            fontSize: 19.sp,
+                                            fontWeight: FontWeight.w400,
+                                            color: numberBackgroundColors,
+                                          ),
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("µ"),
+                                            text: "µ",
+                                            height: 27.sp,
+                                            radius: 50.sp,
+                                            fontSize: 19.sp,
+                                            fontWeight: FontWeight.w400,
+                                            color: numberBackgroundColors,
+                                          ),
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("sin("),
+                                            text: "sin",
+                                            height: 27.sp,
+                                            radius: 50.sp,
+                                            fontSize: 19.sp,
+                                            fontWeight: FontWeight.w400,
+                                            color: numberBackgroundColors,
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("Ac"),
+                                            text: "Ac",
+                                            fontSize: 19.sp,
+                                            color: otherBackgroundColors,
+                                            fontColor:
+                                                theme.colorScheme.outline,
+                                          ),
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("esc"),
+                                            text: "\u232B",
+                                            fontSize: 19.sp,
+                                            color: otherBackgroundColors,
+                                            fontColor:
+                                                theme.colorScheme.outline,
+                                          ),
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("÷"),
+                                            text: "÷",
+                                            color: operatorBackgroundColors,
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("7"),
+                                            text: "7",
+                                            color: numberBackgroundColors,
+                                          ),
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("8"),
+                                            text: "8",
+                                            color: numberBackgroundColors,
+                                          ),
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("9"),
+                                            text: "9",
+                                            color: numberBackgroundColors,
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("4"),
+                                            text: "4",
+                                            color: numberBackgroundColors,
+                                          ),
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("5"),
+                                            text: "5",
+                                            color: numberBackgroundColors,
+                                          ),
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("6"),
+                                            text: "6",
+                                            color: numberBackgroundColors,
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("1"),
+                                            text: "1",
+                                            color: numberBackgroundColors,
+                                          ),
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("2"),
+                                            text: "2",
+                                            color: numberBackgroundColors,
+                                          ),
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("3"),
+                                            text: "3",
+                                            color: numberBackgroundColors,
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("0"),
+                                            text: "0",
+                                            width: 51.5.sp,
+                                            color: numberBackgroundColors,
+                                          ),
+                                          CalculatorButton(
+                                            onPressed: () =>
+                                                handleButtonPress("."),
+                                            text: ".",
+                                            color: numberBackgroundColors,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: width / 4,
+                                  height: height,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      CalculatorButton(
+                                        onPressed: () =>
+                                            handleButtonPress("deg"),
+                                        text: "deg",
+                                        height: 27.sp,
+                                        radius: 50.sp,
+                                        fontSize: 19.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: numberBackgroundColors,
+                                      ),
+                                      CalculatorButton(
+                                        onPressed: () => handleButtonPress("x"),
+                                        text: "x",
+                                        color: operatorBackgroundColors,
+                                      ),
+                                      CalculatorButton(
+                                        onPressed: () => handleButtonPress("-"),
+                                        text: "-",
+                                        color: operatorBackgroundColors,
+                                      ),
+                                      CalculatorButton(
+                                        onPressed: () => handleButtonPress("+"),
+                                        text: "+",
+                                        height: 108.px,
+                                        color: operatorBackgroundColors,
+                                      ),
+                                      CalculatorButton(
+                                        onPressed: () => handleButtonPress("="),
+                                        text: "=",
+                                        height: 108.px,
+                                        color: themeMode == ThemeMode.light
+                                            ? theme
+                                                .colorScheme.secondaryContainer
+                                            : theme
+                                                .colorScheme.secondaryContainer,
+                                        fontColor: Colors.white,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }),
                     ),
                   ],
                 ),
               ),
-              SizedBox(
-                height: 50.h,
-                child: LayoutBuilder(builder: (context, constraints) {
-                  final width = constraints.maxWidth;
-                  final height = constraints.maxHeight;
-                  return Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: width / 4 * 2.98,
-                            height: height,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("e"),
-                                      height: 27.sp,
-                                      radius: 50.sp,
-                                      text: "e",
-                                      fontSize: 19.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: numberBackgroundColors,
-                                    ),
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("µ"),
-                                      text: "µ",
-                                      height: 27.sp,
-                                      radius: 50.sp,
-                                      fontSize: 19.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: numberBackgroundColors,
-                                    ),
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("sin"),
-                                      text: "sin",
-                                      height: 27.sp,
-                                      radius: 50.sp,
-                                      fontSize: 19.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: numberBackgroundColors,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("Ac"),
-                                      text: "Ac",
-                                      fontSize: 19.sp,
-                                      color: otherBackgroundColors,
-                                      fontColor: theme.colorScheme.outline,
-                                    ),
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("esc"),
-                                      text: "\u232B",
-                                      fontSize: 19.sp,
-                                      color: otherBackgroundColors,
-                                      fontColor: theme.colorScheme.outline,
-                                    ),
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("÷"),
-                                      text: "÷",
-                                      color: operatorBackgroundColors,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("7"),
-                                      text: "7",
-                                      color: numberBackgroundColors,
-                                    ),
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("8"),
-                                      text: "8",
-                                      color: numberBackgroundColors,
-                                    ),
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("9"),
-                                      text: "9",
-                                      color: numberBackgroundColors,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("4"),
-                                      text: "4",
-                                      color: numberBackgroundColors,
-                                    ),
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("5"),
-                                      text: "5",
-                                      color: numberBackgroundColors,
-                                    ),
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("6"),
-                                      text: "6",
-                                      color: numberBackgroundColors,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("1"),
-                                      text: "1",
-                                      color: numberBackgroundColors,
-                                    ),
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("2"),
-                                      text: "2",
-                                      color: numberBackgroundColors,
-                                    ),
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("3"),
-                                      text: "3",
-                                      color: numberBackgroundColors,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("0"),
-                                      text: "0",
-                                      width: 51.5.sp,
-                                      color: numberBackgroundColors,
-                                    ),
-                                    CalculatorButton(
-                                      onPressed: () => handleButtonPress("."),
-                                      text: ".",
-                                      color: numberBackgroundColors,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            width: width / 4,
-                            height: height,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                CalculatorButton(
-                                  onPressed: () {},
-                                  text: "deg",
-                                  height: 27.sp,
-                                  radius: 50.sp,
-                                  fontSize: 19.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: numberBackgroundColors,
-                                ),
-                                CalculatorButton(
-                                  onPressed: () => handleButtonPress("x"),
-                                  text: "x",
-                                  color: operatorBackgroundColors,
-                                ),
-                                CalculatorButton(
-                                  onPressed: () => handleButtonPress("-"),
-                                  text: "-",
-                                  color: operatorBackgroundColors,
-                                ),
-                                CalculatorButton(
-                                  onPressed: () => handleButtonPress("+"),
-                                  text: "+",
-                                  height: 108.px,
-                                  color: operatorBackgroundColors,
-                                ),
-                                CalculatorButton(
-                                  onPressed: () => handleButtonPress("="),
-                                  text: "=",
-                                  height: 108.px,
-                                  color: themeMode == ThemeMode.light
-                                      ? theme.colorScheme.secondaryContainer
-                                      : theme.colorScheme.secondaryContainer,
-                                  fontColor: Colors.white,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                }),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

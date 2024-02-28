@@ -28,6 +28,16 @@ ThemeData lightModeTheme = ThemeData(
       fontWeight: FontWeight.w600,
       fontSize: 14.sp,
     ),
+    displayMedium: TextStyle(
+      color: const Color(0xFF818181),
+      fontWeight: FontWeight.w400,
+      fontSize: 18.sp,
+    ),
+    displayLarge: TextStyle(
+      color: const Color(0xFF424242),
+      fontWeight: FontWeight.w600,
+      fontSize: 22.sp,
+    ),
   ),
 );
 
@@ -56,6 +66,16 @@ ThemeData darkModeTheme = ThemeData(
       color: const Color(0xFFA5A5A5),
       fontWeight: FontWeight.w600,
       fontSize: 14.sp,
+    ),
+    displayMedium: TextStyle(
+      color: const Color(0xFF818181),
+      fontWeight: FontWeight.w400,
+      fontSize: 18.sp,
+    ),
+    displayLarge: TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.w600,
+      fontSize: 22.sp,
     ),
   ),
 );

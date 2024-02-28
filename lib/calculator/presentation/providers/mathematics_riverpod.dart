@@ -43,7 +43,12 @@ class CalculatorNotifier extends StateNotifier<CalculatorState> {
   }
 
   void calculateResult() {
-    final result = _evaluate(state.expression);
+    double result;
+    if (state.expression.contains('sin')) {
+      final val = state.expression.split('(');
+      calculateSin(double.parse(val[1]));
+    }
+    result = _evaluate(state.expression);
     print('here here $result');
     state = state.copyWith(result: result.toString());
   }
@@ -59,8 +64,8 @@ class CalculatorNotifier extends StateNotifier<CalculatorState> {
     state = state.copyWith(result: result);
   }
 
-  void calculateSin() {
-    final value = double.tryParse(state.expression) ?? 0;
+  void calculateSin(double value) {
+    //  final value = double.tryParse(state.expression) ?? 0;
     final result = math.sin(value).toString();
     state = state.copyWith(result: result);
   }
@@ -72,57 +77,63 @@ class CalculatorNotifier extends StateNotifier<CalculatorState> {
   }
 
   double _evaluate(String expression) {
-    try {
-      final parts = expression.split(' ');
-      print('here here $parts');
-      print('here here parts length ${parts.length}');
-      if (parts.length > 3) {
-        double result = 0.0;
-        double number2 = 0;
-        String op = '';
-        for (String v in parts) {
-          if (['-', '+', 'x', '÷'].contains(v)) {
-            op = v;
-          } else {
-            if (op == '') {
-              result = double.parse(v);
-            } else {
-              number2 = double.parse(v);
-              switch (op) {
-                case '+':
-                  result = result + number2;
-                case '-':
-                  result = result - number2;
-                case 'x':
-                  result = result * number2;
-                case '÷':
-                  result = result / number2;
-                default:
-                  result = 0.0;
-              }
-            }
-          }
-        }
-        return result;
-      }
-      final num1 = double.parse(parts[0]);
-      final op = parts[1];
-      final num2 = double.parse(parts[2]);
-      switch (op) {
-        case '+':
-          return num1 + num2;
-        case '-':
-          return num1 - num2;
-        case 'x':
-          return num1 * num2;
-        case '÷':
-          return num1 / num2;
-        default:
-          return 0.0;
-      }
-    } catch (e) {
-      return 0.0;
+    List<String> tokens =
+        expression.split(' ').where((token) => token.isNotEmpty).toList();
+    if (state.result.isNotEmpty) {
+      tokens.insert(0, state.result);
     }
+    const precedence = {'+': 1, '-': 1, 'x': 2, '÷': 2};
+
+    List<double> numberStack = [];
+    List<String> operatorStack = [];
+
+    void operate() {
+      if (numberStack.length < 2) return;
+      double number2 = numberStack.removeLast();
+      double number1 = numberStack.removeLast();
+      String operator = operatorStack.removeLast();
+
+      double result;
+      switch (operator) {
+        case '+':
+          result = number1 + number2;
+          break;
+        case '-':
+          result = number1 - number2;
+          break;
+        case 'x':
+          result = number1 * number2;
+          break;
+        case '÷':
+          result = number1 / number2;
+          break;
+        default:
+          throw Exception('Unsupported operator $operator');
+      }
+      numberStack.add(result);
+    }
+
+    for (var token in tokens) {
+      if (token == 'e' || token == 'sin(') {
+        continue;
+      }
+      double? number = double.tryParse(token);
+      if (number != null) {
+        numberStack.add(number);
+      } else if (precedence.containsKey(token)) {
+        while (operatorStack.isNotEmpty &&
+            precedence[token]! <= precedence[operatorStack.last]!) {
+          operate();
+        }
+        operatorStack.add(token);
+      }
+    }
+
+    while (operatorStack.isNotEmpty) {
+      operate();
+    }
+
+    return numberStack.isNotEmpty ? numberStack.last : 0.0;
   }
 }
 
