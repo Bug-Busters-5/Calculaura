@@ -22,7 +22,7 @@ class CalculatorButton extends ConsumerWidget {
     required this.onPressed,
     this.width,
     this.height,
-    this.color,
+    this.color = Colors.white,
     this.style,
     this.radius,
     this.fontColor,
@@ -38,16 +38,23 @@ class CalculatorButton extends ConsumerWidget {
 
     return InkWell(
       highlightColor: Colors.blue.withOpacity(0.4),
-      splashColor: Colors.green.withOpacity(0.5),
+      splashColor: Colors.blue.withOpacity(0.5),
       borderRadius: BorderRadius.circular(radius ?? 15.sp),
       onTap: onPressed,
       child: Container(
         width: width ?? 33.sp,
         height: height ?? 32.sp,
         decoration: BoxDecoration(
-          color: color?.withOpacity( opacity ?? 0.3),
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(radius ?? 15.sp),
           border: Border.all(color: Colors.white.withOpacity(0.3)),
+          boxShadow: [
+            BoxShadow(
+              color: color!.withOpacity(opacity ?? 0.3),
+              spreadRadius: -4.sp,
+              blurRadius: 4.sp,
+            ),
+          ],
         ),
         child: Center(
           child: Text(

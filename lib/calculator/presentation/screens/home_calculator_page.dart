@@ -21,15 +21,15 @@ class HomeCalculatorPage extends ConsumerStatefulWidget {
 
 class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
     with TickerProviderStateMixin {
-   AnimationController? _signInAnimController;
+  AnimationController? _signInAnimController;
 
-   late RiveAnimationController _btnController;
+  late RiveAnimationController _btnController;
 
   @override
   void initState() {
     super.initState();
     _signInAnimController = AnimationController(
-      duration: const Duration(milliseconds: 350),
+      duration: const Duration(milliseconds: 800),
       upperBound: 1,
       vsync: this,
     );
@@ -83,14 +83,14 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
       } else if (value == 'e') {
         calculatorNotifier.appendValue(value);
         calculatorNotifier.calculateE();
-      } 
-      else if (value == 'µ') {
+      } else if (value == 'µ') {
         calculatorNotifier.calculateMicro();
-      } 
-      else if (value == 'sin(') {
+      } else if (value == 'sin(') {
         calculatorNotifier.appendValue(value);
       } else if (value == 'deg') {
         calculatorNotifier.convertDeg();
+                // calculatorNotifier.appendValue(value);
+
       } else {
         if (['-', '+', 'x', '÷'].contains(value)) {
           calculatorNotifier.appendValue(' ');
@@ -101,7 +101,7 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
         }
       }
     }
-
+ 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -168,7 +168,7 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
                         children: [
                           Text(
                             calculatorState.expression,
-                            style: theme.textTheme.displayMedium,
+                            style:  theme.textTheme.displayMedium,
                           ),
                           Text(
                             calculatorState.result,
@@ -257,6 +257,7 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
                                                 handleButtonPress("÷"),
                                             text: "÷",
                                             color: operatorBackgroundColors,
+                                            opacity: 0.4,
                                           ),
                                         ],
                                       ),
@@ -375,23 +376,27 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
                                       CalculatorButton(
                                         onPressed: () => handleButtonPress("x"),
                                         text: "x",
+                                        opacity: 0.4,
                                         color: operatorBackgroundColors,
                                       ),
                                       CalculatorButton(
                                         onPressed: () => handleButtonPress("-"),
                                         text: "-",
+                                        opacity: 0.4,
                                         color: operatorBackgroundColors,
                                       ),
                                       CalculatorButton(
                                         onPressed: () => handleButtonPress("+"),
                                         text: "+",
                                         height: 108.px,
+                                        opacity: 0.4,
                                         color: operatorBackgroundColors,
                                       ),
                                       CalculatorButton(
                                         onPressed: () => handleButtonPress("="),
                                         text: "=",
                                         height: 108.px,
+                                        opacity: 0.5,
                                         color: themeMode == ThemeMode.light
                                             ? theme
                                                 .colorScheme.secondaryContainer
