@@ -4,12 +4,14 @@ import 'package:calculaura/app/app_riverpod.dart';
 import 'package:calculaura/calculator/presentation/providers/mathematics_riverpod.dart';
 import 'package:calculaura/calculator/presentation/widgets/calculator_buttons.dart';
 import 'package:calculaura/core/app_assets.dart';
+import 'package:calculaura/core/colored_symbol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:rive/rive.dart';
+import 'package:rive/rive.dart' hide LinearGradient;
 
 class HomeCalculatorPage extends ConsumerStatefulWidget {
   const HomeCalculatorPage({super.key});
@@ -89,8 +91,7 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
         calculatorNotifier.appendValue(value);
       } else if (value == 'deg') {
         calculatorNotifier.convertDeg();
-                // calculatorNotifier.appendValue(value);
-
+        // calculatorNotifier.appendValue(value);
       } else {
         if (['-', '+', 'x', '÷'].contains(value)) {
           calculatorNotifier.appendValue(' ');
@@ -101,34 +102,18 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
         }
       }
     }
- 
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: Padding(
-          padding: EdgeInsetsDirectional.only(start: 12.sp),
-          child: GestureDetector(
-            onTap: () {
-              if (themeMode == ThemeMode.dark) {
-                ref.watch(themeProvider.notifier).state = ThemeMode.light;
-              } else {
-                ref.watch(themeProvider.notifier).state = ThemeMode.dark;
-              }
-            },
-            child: CircleAvatar(
-              child: themeMode == ThemeMode.dark
-                  ? const Icon(Icons.light_mode)
-                  : SvgPicture.asset(
-                      'assets/icons/moon.svg',
-                      height: 18.sp,
-                      width: 18.sp,
-                    ),
-            ),
-          ),
-        ),
-      ),
       body: Stack(
         children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [
+                Colors.blue.withOpacity(0.1),
+                Colors.white.withOpacity(0.1)
+              ], begin: Alignment.bottomCenter, end: Alignment.topRight),
+            ),
+          ),
           ImageFiltered(
             imageFilter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
             child: Center(
@@ -166,9 +151,13 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            calculatorState.expression,
-                            style:  theme.textTheme.displayMedium,
+                          RichText(
+                            text: TextSpan(
+                              style: theme.textTheme.displayMedium,
+                              children: coloredSymbol(
+                                calculatorState.expression,
+                              ),
+                            ),
                           ),
                           Text(
                             calculatorState.result,
@@ -418,6 +407,33 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
               ),
             ),
           ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: EdgeInsetsDirectional.only(start: 12.sp),
+                child: GestureDetector(
+                  onTap: () {
+                    if (themeMode == ThemeMode.dark) {
+                      ref.watch(themeProvider.notifier).state = ThemeMode.light;
+                    } else {
+                      ref.watch(themeProvider.notifier).state = ThemeMode.dark;
+                    }
+                  },
+                  child: CircleAvatar(
+                    radius: 20.sp,
+                    child: themeMode == ThemeMode.dark
+                        ? const Icon(Icons.light_mode)
+                        : SvgPicture.asset(
+                            'assets/icons/moon.svg',
+                            height: 18.sp,
+                            width: 18.sp,
+                          ),
+                  ),
+                ),
+              ),
+            ),
+          )
         ],
       ),
     );
