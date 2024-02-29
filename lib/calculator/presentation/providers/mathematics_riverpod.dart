@@ -49,7 +49,6 @@ class CalculatorNotifier extends StateNotifier<CalculatorState> {
       calculateSin(double.parse(val[1]));
     }
     result = _evaluate(state.expression);
-    print('here here $result');
     state = state.copyWith(result: result.toString());
   }
 

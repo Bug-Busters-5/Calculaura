@@ -21,11 +21,9 @@ class HomeCalculatorPage extends ConsumerStatefulWidget {
 
 class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
     with TickerProviderStateMixin {
-  // Animation controller that shows the sign up modal as well as translateY boarding content together
-  AnimationController? _signInAnimController;
+   AnimationController? _signInAnimController;
 
-  // Control touch effect animation for the "Start the Course" button
-  late RiveAnimationController _btnController;
+   late RiveAnimationController _btnController;
 
   @override
   void initState() {
@@ -85,9 +83,11 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
       } else if (value == 'e') {
         calculatorNotifier.appendValue(value);
         calculatorNotifier.calculateE();
-      } else if (value == 'µ') {
+      } 
+      else if (value == 'µ') {
         calculatorNotifier.calculateMicro();
-      } else if (value == 'sin(') {
+      } 
+      else if (value == 'sin(') {
         calculatorNotifier.appendValue(value);
       } else if (value == 'deg') {
         calculatorNotifier.convertDeg();
