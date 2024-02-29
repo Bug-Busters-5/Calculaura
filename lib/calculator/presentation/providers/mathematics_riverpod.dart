@@ -47,6 +47,7 @@ class CalculatorNotifier extends StateNotifier<CalculatorState> {
     if (state.expression.contains('sin')) {
       final val = state.expression.split('(');
       calculateSin(double.parse(val[1]));
+      // convertDeg(double.parse(val[1]));
     }
     result = _evaluate(state.expression);
     state = state.copyWith(result: result.toString());
@@ -60,7 +61,7 @@ class CalculatorNotifier extends StateNotifier<CalculatorState> {
   void calculateMicro() {
     final value = double.tryParse(state.expression) ?? 0;
     final result = (value * math.pow(10, -6)).toString();
-    state = state.copyWith(result: result);
+    state = state.copyWith(result: result.toString() , expression: result.toString() );
   }
 
   void calculateSin(double value) {
@@ -72,7 +73,7 @@ class CalculatorNotifier extends StateNotifier<CalculatorState> {
   void convertDeg() {
     final value = double.tryParse(state.expression) ?? 0;
     final radians = (value * math.pi / 180).toString();
-    state = state.copyWith(result: radians);
+    state = state.copyWith(result: radians.toString() , expression: radians.toString());
   }
 
   double _evaluate(String expression) {

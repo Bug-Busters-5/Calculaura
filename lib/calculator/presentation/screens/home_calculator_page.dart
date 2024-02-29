@@ -7,10 +7,11 @@ import 'package:calculaura/core/app_assets.dart';
 import 'package:calculaura/core/colored_symbol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:rive/rive.dart';
+import 'package:rive/rive.dart' hide LinearGradient;
 
 class HomeCalculatorPage extends ConsumerStatefulWidget {
   const HomeCalculatorPage({super.key});
@@ -30,7 +31,7 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
   void initState() {
     super.initState();
     _signInAnimController = AnimationController(
-      duration: const Duration(milliseconds: 350),
+      duration: const Duration(milliseconds: 800),
       upperBound: 1,
       vsync: this,
     );
@@ -90,6 +91,7 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
         calculatorNotifier.appendValue(value);
       } else if (value == 'deg') {
         calculatorNotifier.convertDeg();
+        // calculatorNotifier.appendValue(value);
       } else {
         if (['-', '+', 'x', '÷'].contains(value)) {
           calculatorNotifier.appendValue(' ');
@@ -102,32 +104,16 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
     }
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: Padding(
-          padding: EdgeInsetsDirectional.only(start: 12.sp),
-          child: GestureDetector(
-            onTap: () {
-              if (themeMode == ThemeMode.dark) {
-                ref.watch(themeProvider.notifier).state = ThemeMode.light;
-              } else {
-                ref.watch(themeProvider.notifier).state = ThemeMode.dark;
-              }
-            },
-            child: CircleAvatar(
-              child: themeMode == ThemeMode.dark
-                  ? const Icon(Icons.light_mode)
-                  : SvgPicture.asset(
-                      'assets/icons/moon.svg',
-                      height: 18.sp,
-                      width: 18.sp,
-                    ),
-            ),
-          ),
-        ),
-      ),
       body: Stack(
         children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [
+                Colors.blue.withOpacity(0.1),
+                Colors.white.withOpacity(0.1)
+              ], begin: Alignment.bottomCenter, end: Alignment.topRight),
+            ),
+          ),
           ImageFiltered(
             imageFilter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
             child: Center(
@@ -260,6 +246,7 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
                                                 handleButtonPress("÷"),
                                             text: "÷",
                                             color: operatorBackgroundColors,
+                                            opacity: 0.4,
                                           ),
                                         ],
                                       ),
@@ -378,23 +365,27 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
                                       CalculatorButton(
                                         onPressed: () => handleButtonPress("x"),
                                         text: "x",
+                                        opacity: 0.4,
                                         color: operatorBackgroundColors,
                                       ),
                                       CalculatorButton(
                                         onPressed: () => handleButtonPress("-"),
                                         text: "-",
+                                        opacity: 0.4,
                                         color: operatorBackgroundColors,
                                       ),
                                       CalculatorButton(
                                         onPressed: () => handleButtonPress("+"),
                                         text: "+",
                                         height: 108.px,
+                                        opacity: 0.4,
                                         color: operatorBackgroundColors,
                                       ),
                                       CalculatorButton(
                                         onPressed: () => handleButtonPress("="),
                                         text: "=",
                                         height: 108.px,
+                                        opacity: 0.5,
                                         color: themeMode == ThemeMode.light
                                             ? theme
                                                 .colorScheme.secondaryContainer
@@ -416,6 +407,33 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
               ),
             ),
           ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: EdgeInsetsDirectional.only(start: 12.sp, top: 12.sp),
+                child: GestureDetector(
+                  onTap: () {
+                    if (themeMode == ThemeMode.dark) {
+                      ref.watch(themeProvider.notifier).state = ThemeMode.light;
+                    } else {
+                      ref.watch(themeProvider.notifier).state = ThemeMode.dark;
+                    }
+                  },
+                  child: CircleAvatar(
+                    radius: 20.sp,
+                    child: themeMode == ThemeMode.dark
+                        ? const Icon(Icons.light_mode)
+                        : SvgPicture.asset(
+                            'assets/icons/moon.svg',
+                            height: 18.sp,
+                            width: 18.sp,
+                          ),
+                  ),
+                ),
+              ),
+            ),
+          )
         ],
       ),
     );
