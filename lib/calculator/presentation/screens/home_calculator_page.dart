@@ -165,15 +165,14 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Text(
-                          //   calculatorState.expression,
-                          //   style: theme.textTheme.displayMedium,
-                          // ),
                           RichText(
-                              text: TextSpan(
-                                  style: theme.textTheme.displayMedium,
-                                  children: coloredSymbol(
-                                      calculatorState.expression))),
+                            text: TextSpan(
+                              style: theme.textTheme.displayMedium,
+                              children: coloredSymbol(
+                                calculatorState.expression,
+                              ),
+                            ),
+                          ),
                           Text(
                             calculatorState.result,
                             style: theme.textTheme.displayLarge,
