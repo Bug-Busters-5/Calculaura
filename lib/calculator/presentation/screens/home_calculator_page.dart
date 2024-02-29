@@ -4,6 +4,7 @@ import 'package:calculaura/app/app_riverpod.dart';
 import 'package:calculaura/calculator/presentation/providers/mathematics_riverpod.dart';
 import 'package:calculaura/calculator/presentation/widgets/calculator_buttons.dart';
 import 'package:calculaura/core/app_assets.dart';
+import 'package:calculaura/core/colored_symbol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,9 +22,9 @@ class HomeCalculatorPage extends ConsumerStatefulWidget {
 
 class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
     with TickerProviderStateMixin {
-   AnimationController? _signInAnimController;
+  AnimationController? _signInAnimController;
 
-   late RiveAnimationController _btnController;
+  late RiveAnimationController _btnController;
 
   @override
   void initState() {
@@ -83,11 +84,9 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
       } else if (value == 'e') {
         calculatorNotifier.appendValue(value);
         calculatorNotifier.calculateE();
-      } 
-      else if (value == 'µ') {
+      } else if (value == 'µ') {
         calculatorNotifier.calculateMicro();
-      } 
-      else if (value == 'sin(') {
+      } else if (value == 'sin(') {
         calculatorNotifier.appendValue(value);
       } else if (value == 'deg') {
         calculatorNotifier.convertDeg();
@@ -166,10 +165,15 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            calculatorState.expression,
-                            style: theme.textTheme.displayMedium,
-                          ),
+                          // Text(
+                          //   calculatorState.expression,
+                          //   style: theme.textTheme.displayMedium,
+                          // ),
+                          RichText(
+                              text: TextSpan(
+                                  style: theme.textTheme.displayMedium,
+                                  children: coloredSymbol(
+                                      calculatorState.expression))),
                           Text(
                             calculatorState.result,
                             style: theme.textTheme.displayLarge,
