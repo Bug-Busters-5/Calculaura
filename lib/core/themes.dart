@@ -5,15 +5,17 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 ThemeData lightModeTheme = ThemeData(
   useMaterial3: true,
-  brightness: Brightness.light,
-  primaryColor: const Color(0xFFADE2FF),
-  primaryColorDark: const Color(0xFF19ACFF),
-  primaryColorLight: const Color(0xFF7CC9FF),
-  backgroundColor: Colors.white,
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: const Color(0xFFADE2FF),
+    secondary: const Color(0xFF19ACFF),
+    onSecondaryContainer: const Color(0xFF7CC9FF),
+    secondaryContainer: const Color(0xFF19ACFF),
+    background: const Color(0xFFF7F8FB),
+  ),
   textTheme: TextTheme(
     titleMedium: TextStyle(
       color: const Color(0XFF38B9FF),
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeight.w700,
       fontSize: 14.sp,
     ),
     titleSmall: TextStyle(
@@ -26,34 +28,54 @@ ThemeData lightModeTheme = ThemeData(
       fontWeight: FontWeight.w600,
       fontSize: 14.sp,
     ),
+    displayMedium: TextStyle(
+      color: const Color(0xFF818181),
+      fontWeight: FontWeight.w400,
+      fontSize: 18.sp,
+    ),
+    displayLarge: TextStyle(
+      color: const Color(0xFF424242),
+      fontWeight: FontWeight.w600,
+      fontSize: 22.sp,
+    ),
   ),
 );
 
-
-
 ThemeData darkModeTheme = ThemeData(
   useMaterial3: true,
-  brightness: Brightness.dark,
-  primaryColor: const Color(0xFF005DB2),
-  primaryColorDark: const Color(0xFF1991FF),
-  primaryColorLight: const Color(0xFF29A8FF),
-    backgroundColor:const  Color(0xFF17181A),
-
+  colorScheme: ColorScheme.fromSeed(
+    brightness: Brightness.dark,
+    seedColor: const Color(0xFF005DB2),
+    secondary: const Color(0xFF1991FF),
+    background: const Color(0xFF17181A),
+    onSecondaryContainer: const Color(0xFF303136),
+    secondaryContainer: const Color(0xFF1991FF),
+  ),
   textTheme: TextTheme(
     titleMedium: TextStyle(
       color: const Color(0XFF29A8FF),
       fontWeight: FontWeight.w600,
-      fontSize: 14.sp,
+      fontSize: 16.sp,
     ),
     titleSmall: TextStyle(
       color: const Color(0xFF29A8FF),
       fontWeight: FontWeight.w600,
-      fontSize: 12.sp,
+      fontSize: 14.sp,
     ),
     labelLarge: TextStyle(
       color: const Color(0xFFA5A5A5),
       fontWeight: FontWeight.w600,
       fontSize: 14.sp,
+    ),
+    displayMedium: TextStyle(
+      color: const Color(0xFF818181),
+      fontWeight: FontWeight.w400,
+      fontSize: 18.sp,
+    ),
+    displayLarge: TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.w600,
+      fontSize: 22.sp,
     ),
   ),
 );

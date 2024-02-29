@@ -1,3 +1,4 @@
+import 'package:calculaura/app/app_riverpod.dart';
 import 'package:calculaura/calculator/presentation/screens/home_calculator_page.dart';
 import 'package:calculaura/core/themes.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
     return ResponsiveSizer(
       builder: (context, orientation, screenType) {
         return MaterialApp(
@@ -24,8 +26,8 @@ class MyApp extends ConsumerWidget {
           title: 'calculaura',
           home: const HomeCalculatorPage(),
           theme: lightModeTheme,
-          darkTheme:darkModeTheme,
-           themeMode: ThemeMode.system,
+          darkTheme: darkModeTheme,
+          themeMode: themeMode,
         );
       },
     );
