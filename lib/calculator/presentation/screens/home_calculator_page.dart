@@ -411,7 +411,7 @@ class _HomeCalculatorPageState extends ConsumerState<HomeCalculatorPage>
             child: Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: EdgeInsetsDirectional.only(start: 12.sp),
+                padding: EdgeInsetsDirectional.only(start: 12.sp, top: 12.sp),
                 child: GestureDetector(
                   onTap: () {
                     if (themeMode == ThemeMode.dark) {
